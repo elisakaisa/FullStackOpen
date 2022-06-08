@@ -1,50 +1,131 @@
 import React, { useState , useEffect} from 'react'
-import axios from 'axios'
 
 import PersonForm from "./components/PersonForm"
 import Filter from "./components/Filter"
 import Persons from "./components/Persons"
+import personsService from './services/persons'
+import './index.css'
 
 
 
 const App = () => {
   const [persons, setPersons] = useState([])
-
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
+    personsService
+      .getAll()
+      .then(initialPerson => {
+        setPersons(initialPerson)
       })
   }, [])
-  console.log('render', persons.length, 'persons')
+  
+  const Notification = ({ message }) => {
+    if (message === null) {
+      return null
+    }
+    return (
+      <div className='error'>
+        {message}
+      </div>
+    )
+  }
+
+  const checkHandle404Error = (error, name, id) => {
+    if (error.isAxiosError && error.response && error.response.status === 404) {
+      setErrorMessage(
+        `Information of ${name} has already been removed from the phonebook.`
+        )
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+      setPersons(persons.filter(p => p.id !== id));
+      return true;
+    }
+    return false;
+  };
 
   const addName = (event) => {
     event.preventDefault()
     const nameObject = {
       name: newName,
-      number: newNumber,
-      id: persons + 1,
+      number: newNumber
     }
 
     const existingPerson = persons.find(
       (person) => person.name.toLowerCase() === newName.toLowerCase()
     )
+    
     if (existingPerson) {
-      alert(`${newName} is already added to phonebook`)
-      setNewName('')
-      setNewNumber('')
+      const id = existingPerson.id
+      if (!window.confirm(`${existingPerson.name} is already in, sure you want the replace the old number?`)) return;
+      personsService
+        .update(id, nameObject)
+        .then(returnedPerson => {
+          setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
+          setNewName('')
+          setNewNumber('')
+          setErrorMessage(
+            `${nameObject.name}'s number was successfully updated`
+            )
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+          if (checkHandle404Error(error, existingPerson.name, id)) {
+            setNewName("");
+            setNewNumber("");
+          } else {
+            setErrorMessage(
+              `Failed to update ${existingPerson.name}'s number in the phonebook. ${error}`
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+          }
+        });
+
     } else {
-      setPersons(persons.concat(nameObject))
-      setNewName('')
-      setNewNumber('')
+      personsService
+        .create(nameObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+          setErrorMessage(
+            `${nameObject.name} was successfully added to the phonebook`
+          )
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        })
     }   
+  }
+
+  const deleteName = (id) => {
+    let person = persons.find(p => p.id === id);
+    if (!window.confirm(`Are you sure you want to delete ${person.name}?`)) return;
+    
+    personsService
+      .deletename(id)
+      .then(() => {
+        //showMessage(`Removed ${person.name} successfully`);
+        setPersons(persons.filter(person => person.id !== id));
+      })
+      .catch(error => {
+        if (!checkHandle404Error(error, person.name, id)) {
+          setErrorMessage(
+            `Failed to remove ${person.name} from the phonebook. ${error}`
+          )
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        }
+      });
   }
 
 
@@ -76,8 +157,9 @@ const App = () => {
                   handleNumberChange={handleNumberChange}
                   handleNameChange={handleNameChange}
                   addName={addName} />
+      <Notification message={errorMessage} />
       <h2>Numbers</h2>
-      <Persons numbers={filteredPersons} />
+      <Persons numbers={filteredPersons} deleteName={deleteName}/>
     </div>
   )
 }
