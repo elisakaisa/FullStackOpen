@@ -16,6 +16,7 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
+    // fetch all data
     personsService
       .getAll()
       .then(initialPerson => {
@@ -23,6 +24,7 @@ const App = () => {
       })
   }, [])
   
+  // error message
   const Notification = ({ message }) => {
     if (message === null) {
       return null
@@ -48,6 +50,7 @@ const App = () => {
     return false;
   };
 
+  // adding a new name
   const addName = (event) => {
     event.preventDefault()
     const nameObject = {
@@ -106,20 +109,24 @@ const App = () => {
     }   
   }
 
-  const deleteName = (id) => {
-    let person = persons.find(p => p.id === id);
-    if (!window.confirm(`Are you sure you want to delete ${person.name}?`)) return;
+  const deleteName = (personToDelete) => {
+    //let person = persons.find(p => p.id === id);
+    //if (!window.confirm(`Are you sure you want to delete ${personToDelete.name}?`)) return;
+    console.log(personToDelete.id)
     
     personsService
-      .deletename(id)
+      .deletename(personToDelete.id)
       .then(() => {
-        //showMessage(`Removed ${person.name} successfully`);
-        setPersons(persons.filter(person => person.id !== id));
+        setErrorMessage(`Removed ${personToDelete.name} successfully`)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+        setPersons(persons.filter(person => person.id !== personToDelete.id))
       })
       .catch(error => {
-        if (!checkHandle404Error(error, person.name, id)) {
+        if (!checkHandle404Error(error, personToDelete.name, personToDelete.id)) {
           setErrorMessage(
-            `Failed to remove ${person.name} from the phonebook. ${error}`
+            `Failed to remove ${personToDelete.name} from the phonebook. ${error}`
           )
           setTimeout(() => {
             setErrorMessage(null)
