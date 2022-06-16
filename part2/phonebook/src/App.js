@@ -3,6 +3,7 @@ import React, { useState , useEffect} from 'react'
 import PersonForm from "./components/PersonForm"
 import Filter from "./components/Filter"
 import Persons from "./components/Persons"
+import Notification from "./components/Notification"
 import personsService from './services/persons'
 import './index.css'
 
@@ -13,6 +14,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
@@ -22,19 +24,14 @@ const App = () => {
       .then(initialPerson => {
         setPersons(initialPerson)
       })
+      .catch(error => {
+        setErrorMessage(error.response.data.error)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      })
   }, [])
   
-  // error message
-  const Notification = ({ message }) => {
-    if (message === null) {
-      return null
-    }
-    return (
-      <div className='error'>
-        {message}
-      </div>
-    )
-  }
 
   const checkHandle404Error = (error, name, id) => {
     if (error.isAxiosError && error.response && error.response.status === 404) {
@@ -71,13 +68,21 @@ const App = () => {
           setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
           setNewName('')
           setNewNumber('')
-          setErrorMessage(
+          setNotificationMessage(
             `${nameObject.name}'s number was successfully updated`
             )
+          setTimeout(() => {
+            setNotificationMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+          setErrorMessage(error.response.data.error)
           setTimeout(() => {
             setErrorMessage(null)
           }, 5000)
         })
+
+        /*
         .catch(error => {
           if (checkHandle404Error(error, existingPerson.name, id)) {
             setNewName("");
@@ -90,7 +95,7 @@ const App = () => {
               setErrorMessage(null)
             }, 5000)
           }
-        });
+        }); */
 
     } else {
       personsService
@@ -99,9 +104,15 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
-          setErrorMessage(
+          setNotificationMessage(
             `${nameObject.name} was successfully added to the phonebook`
           )
+          setTimeout(() => {
+            setNotificationMessage(null)
+          }, 5000)
+        })
+        .catch(error => {
+          setErrorMessage(error.response.data.error)
           setTimeout(() => {
             setErrorMessage(null)
           }, 5000)
@@ -111,15 +122,15 @@ const App = () => {
 
   const deleteName = (personToDelete) => {
     //let person = persons.find(p => p.id === id);
-    //if (!window.confirm(`Are you sure you want to delete ${personToDelete.name}?`)) return;
+    if (!window.confirm(`Are you sure you want to delete ${personToDelete.name}?`)) return;
     console.log(personToDelete.id)
     
     personsService
       .deletename(personToDelete.id)
       .then(() => {
-        setErrorMessage(`Removed ${personToDelete.name} successfully`)
+        setNotificationMessage(`Removed ${personToDelete.name} successfully`)
         setTimeout(() => {
-          setErrorMessage(null)
+          setNotificationMessage(null)
         }, 5000)
         setPersons(persons.filter(person => person.id !== personToDelete.id))
       })
@@ -164,7 +175,8 @@ const App = () => {
                   handleNumberChange={handleNumberChange}
                   handleNameChange={handleNameChange}
                   addName={addName} />
-      <Notification message={errorMessage} />
+      <Notification type='error' message={errorMessage} />
+      <Notification type='success' message={notificationMessage} />
       <h2>Numbers</h2>
       <Persons numbers={filteredPersons} deleteName={deleteName}/>
     </div>
