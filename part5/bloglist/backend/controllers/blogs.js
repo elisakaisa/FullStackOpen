@@ -13,15 +13,40 @@ router.get('/', async (request, response) => {
 })
 
 router.post('/', async (request, response) => {
-  if (!request.user) {
+  const body = request.body
+
+  // Check token
+  if (!request.decodedToken) {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
 
-  const user = request.user
-  const blog = new Blog({ ...request.body, user: user.id })
+  // check content
+  if (!body.title) {
+    return response.status(400).json({
+      error: 'title missing'
+    })
+  }
+
+  if (!body.url) {
+    return response.status(400).json({
+      error: 'url missing'
+    })
+  }
+
+  // get user
+  const user = await User.findById(request.decodedToken.id)
+
+  const blog = new Blog({
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes === undefined ? 0 : body.likes,
+    user: user._id
+  })
 
   const savedBlog = await blog.save()
 
+  // blog's id added to the user
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 
