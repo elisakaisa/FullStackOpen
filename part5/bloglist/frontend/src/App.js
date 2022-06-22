@@ -123,7 +123,7 @@ const App = () => {
     if (!window.confirm(`Do you want to remove the blog "${blog.title}"?`)) {return}
     try {
       const response = await blogService.removeBlog(blog.id)
-      if (response.hasOwnProperty('error')) {
+      if ({}.hasOwnProperty.call(response, 'error')) {
         setErrorMessage(response.error)
         setTimeout(() => {
           setErrorMessage(null)
@@ -168,7 +168,7 @@ const App = () => {
           </Togglable>
           <h2>Blogs</h2>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} setErrorMessage={setErrorMessage} deleteBlog={deleteBlog} user={user} />
+            <Blog key={blog.id} blog={blog} setErrorMessage={setErrorMessage} deleteBlog={deleteBlog} user={user} blogService={blogService} />
           )}
         </div>
       }

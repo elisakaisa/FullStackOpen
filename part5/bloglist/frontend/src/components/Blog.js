@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import blogService from '../services/blogs'
 
-const Blog = ({ blog, setErrorMessage, deleteBlog, user }) => {
+const Blog = ({ blog, setErrorMessage, deleteBlog, user, blogService }) => {
 
   // styling
   const blogStyle = {
@@ -21,7 +20,7 @@ const Blog = ({ blog, setErrorMessage, deleteBlog, user }) => {
     event.preventDefault()
     try {
       const response = await blogService.updateLike(blog)
-      if (response.hasOwnProperty('error')) {
+      if ({}.hasOwnProperty.call(response, 'error')) {
         setErrorMessage(response.error)
         setTimeout(() => {
           setErrorMessage(null)
@@ -42,8 +41,8 @@ const Blog = ({ blog, setErrorMessage, deleteBlog, user }) => {
 
 
   return (
-    <div style={blogStyle}>
-      <p>{blog.title} by {blog.author}</p>
+    <div style={blogStyle} className='blog'>
+      {blog.title} by {blog.author}
 
       {visibility &&
           <div>

@@ -18,6 +18,10 @@
     "eslint": "eslint ."
   },
   "devDependencies": {
+    "@testing-library/dom": "^8.13.0",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^14.2.1",
     "eslint-plugin-jest": "^26.5.3",
     "eslint-plugin-react": "^7.30.0"
   }
