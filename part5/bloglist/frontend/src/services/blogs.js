@@ -39,10 +39,13 @@ const create = async newObject => {
 const updateLike = async (blog) => {
 
   try {
+    console.log('uodateLike: try entered')
     const likedBlog = blog
+    console.log('updateLike: likedBlog', likedBlog)
     likedBlog.likes = blog.likes + 1
-    console.log(likedBlog)
+    console.log(`${baseUrl}/${blog.id}`)
     const response = await axios.put(`${baseUrl}/${blog.id}`, likedBlog)
+    console.log('respomse.data', response.data)
     return response.data
   }
   catch (error) {

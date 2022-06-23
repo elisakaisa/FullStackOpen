@@ -20,29 +20,13 @@ router.post('/', async (request, response) => {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
 
-  // check content
-  if (!body.title) {
-    return response.status(400).json({
-      error: 'title missing'
-    })
-  }
-
-  if (!body.url) {
-    return response.status(400).json({
-      error: 'url missing'
-    })
-  }
-
-  // get user
-  const user = await User.findById(request.decodedToken.id)
-
-  const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes === undefined ? 0 : body.likes,
-    user: user._id
-  })
+  const user = request.user
+  const blog = new Blog({ 
+    title: request.body.title,
+    author: request.body.author,
+    url: request.body.url,
+    likes: request.body.likes === undefined ? 0 : request.body.likes,
+    user: user.id })
 
   const savedBlog = await blog.save()
 
@@ -72,7 +56,12 @@ router.delete('/:id', async (request, response) => {
 })
 
 router.put('/:id', async (request, response) => {
-  const blog = request.body
+  const blog = {
+    title: request.body.title,
+    author: request.body.author,
+    url: request.body.url,
+    likes: request.body.likes === undefined ? 0 : request.body.likes
+  }
 
   const updatedBlog = await Blog
     .findByIdAndUpdate(
