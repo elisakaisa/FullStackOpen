@@ -13,7 +13,10 @@ router.get('/', async (request, response) => {
 })
 
 router.post('/', async (request, response) => {
-  if (!request.user) {
+  const body = request.body
+
+  // Check token
+  if (!request.decodedToken) {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
 
@@ -27,6 +30,7 @@ router.post('/', async (request, response) => {
 
   const savedBlog = await blog.save()
 
+  // blog's id added to the user
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 

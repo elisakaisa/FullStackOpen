@@ -94,29 +94,6 @@ const App = () => {
     }, 5000)
   }
 
-  // Blog SERVICE
-  const createBlog = (blogObject) => {
-    addBlogRef.current.toggleVisibility()
-    blogService
-      .create(blogObject)
-      .then(returnedBlog => {
-        setBlogs(blogs.concat(returnedBlog))
-
-        setNotificationMessage(
-          `${blogObject.title} was successfully added!`
-        )
-        setTimeout(() => {
-          setNotificationMessage(null)
-        }, 5000)
-      })
-      .catch(error => {
-        setErrorMessage(error.response.data.error)
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 5000)
-      })
-  }
-
   // delete blog
   const deleteBlog = async (blog) => {
     if (!window.confirm(`Do you want to remove the blog "${blog.title}"?`)) {return}
@@ -163,7 +140,12 @@ const App = () => {
             </button>
           </p>
           <Togglable buttonLabel='add new blog' ref={addBlogRef}>
-            <Addblog createBlog={createBlog}/>
+            <Addblog
+              blogService={blogService}
+              setErrorMessage={setErrorMessage}
+              blogs={blogs}
+              setBlogs={setBlogs}
+              setNotificationMessage={setNotificationMessage}/>
           </Togglable>
           <h2>Blogs</h2>
           {blogs.map(blog =>

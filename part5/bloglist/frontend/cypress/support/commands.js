@@ -1,5 +1,3 @@
-
-
 Cypress.Commands.add('login', ({ username, password }) => {
   cy.request('POST', 'http://localhost:3003/api/login', {
     username, password
@@ -8,6 +6,7 @@ Cypress.Commands.add('login', ({ username, password }) => {
     cy.visit('http://localhost:3000')
   })
 })
+
 
 Cypress.Commands.add('createBlog', ({ title, author, url, likes }) => {
   cy.request({
