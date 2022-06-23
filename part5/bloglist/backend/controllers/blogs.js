@@ -18,7 +18,12 @@ router.post('/', async (request, response) => {
   }
 
   const user = request.user
-  const blog = new Blog({ ...request.body, user: user.id })
+  const blog = new Blog({ 
+    title: request.body.title,
+    author: request.body.author,
+    url: request.body.url,
+    likes: request.body.likes === undefined ? 0 : request.body.likes,
+    user: user.id })
 
   const savedBlog = await blog.save()
 
