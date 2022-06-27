@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 
+
 const Blog = ({ blog, setErrorMessage, deleteBlog, user, blogService }) => {
 
   // styling
@@ -20,7 +21,9 @@ const Blog = ({ blog, setErrorMessage, deleteBlog, user, blogService }) => {
     event.preventDefault()
     try {
       const response = await blogService.updateLike(blog)
+      console.log('onLike', blog)
       if ({}.hasOwnProperty.call(response, 'error')) {
+        console.log('error in onlike')
         setErrorMessage(response.error)
         setTimeout(() => {
           setErrorMessage(null)
