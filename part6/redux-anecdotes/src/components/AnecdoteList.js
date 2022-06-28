@@ -5,7 +5,7 @@ import { hideNotification, showNotification } from '../reducers/notificationRedu
 const AnecdoteList = () => {
     const dispatch = useDispatch()
 
-    // get anmecdotes from state and filter them
+    // get anecdotes from state and filter them
     let anecdotes = useSelector(
         state => state.anecdotes.filter(
             anecdote => anecdote.content.toLocaleLowerCase().includes(state.filter.toLocaleLowerCase())
