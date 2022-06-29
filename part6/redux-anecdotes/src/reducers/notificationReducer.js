@@ -18,10 +18,18 @@ const notificationSlice = createSlice({
 
 export const { showNotification, hideNotification } = notificationSlice.actions
 
+let timeoutID = null
+
 export const setNotification = (message, timeout) => {
     return async (dispatch) => {
         dispatch(showNotification(message))
-        setTimeout(() => {
+
+        // if timer already going: clear it
+        if (timeoutID) {
+            clearTimeout(timeoutID);
+        }
+
+        timeoutID = setTimeout(() => {
             dispatch(hideNotification())
         }, (timeout*1000))
     }

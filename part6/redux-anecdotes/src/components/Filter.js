@@ -1,14 +1,15 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
+//import { useDispatch } from 'react-redux'
+import { connect } from 'react-redux'
 
 //internal imports
 import { filter } from '../reducers/filterReducer'
 
-const Filter = () => {
-    const dispatch = useDispatch()
+const Filter = (props) => {
+    //const dispatch = useDispatch()
     const handleChange = (event) => {
       // input-field value is in variable event.target.value
-      dispatch(filter(event.target.value))
+      props.filter(event.target.value)
     }
     const style = {
       marginBottom: 10
@@ -19,6 +20,10 @@ const Filter = () => {
         filter <input onChange={handleChange} />
       </div>
     )
-  }
+}
+
+const mapDispatchToProps = {
+  filter
+}
   
-  export default Filter
+export default connect(null, mapDispatchToProps)(Filter)
