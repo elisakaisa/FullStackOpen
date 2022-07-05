@@ -1,14 +1,10 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
-
+import { createBlog } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
 
-const Addblog = ({
-    blogService,
-    blogs,
-    setBlogs,
-}) => {
-  const dispatch = useDispatch()
+const Addblog = () => {
+    const dispatch = useDispatch()
     const [newTitle, setNewTitle] = useState('')
     const [newAuthor, setNewAuthor] = useState('')
     const [newUrl, setNewUrl] = useState('')
@@ -16,6 +12,19 @@ const Addblog = ({
     // ADD BLOG
     const addBlog = async (event) => {
         event.preventDefault()
+        dispatch(
+            createBlog({
+                title: newTitle,
+                author: newAuthor,
+                url: newUrl,
+                likes: 0,
+            })
+        )
+        setNewTitle('')
+        setNewAuthor('')
+        setNewUrl('')
+
+        /*
         try {
             const newBlog = await blogService.create({
                 title: newTitle,
@@ -37,7 +46,7 @@ const Addblog = ({
             setNewUrl('')
         } catch (error) {
             dispatch(setNotification(error, 5))
-        }
+        } */
     }
 
     return (

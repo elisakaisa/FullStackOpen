@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 // Services
 import blogService from './services/blogs'
@@ -12,6 +12,7 @@ import Addblog from './components/Addblog'
 import Loginform from './components/Loginform'
 import Togglable from './components/Togglable'
 import { setNotification } from './reducers/notificationReducer'
+import { initializeBlogs } from './reducers/blogReducer'
 import './index.css'
 
 const App = () => {
@@ -19,7 +20,6 @@ const App = () => {
   const dispatch = useDispatch()
 
     // STATES
-    const [blogs, setBlogs] = useState([])
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
@@ -28,15 +28,9 @@ const App = () => {
     const addBlogRef = useRef()
 
     useEffect(() => {
-        blogService
-            .getAll()
-            .then(
-                (blogs) => setBlogs(blogs.sort((a, b) => b.likes - a.likes)) // descending order
-            )
-            .catch((error) => {
-              dispatch(setNotification(error.response.data.error, 5))
-            })
-    }, [])
+      dispatch(initializeBlogs())
+    }, [dispatch])
+    const blogs = useSelector(state => state.blogs)
 
     // fetch user from local storage
     useEffect(() => {
@@ -94,7 +88,8 @@ const App = () => {
             if ({}.hasOwnProperty.call(response, 'error')) {
               dispatch(setNotification(response.error, 5))
             } else {
-                setBlogs(blogs.filter((b) => b.id !== blog.id))
+                //setBlogs(blogs.filter((b) => b.id !== blog.id))
+                dispatch(initializeBlogs())
             }
         } catch (error) {
           dispatch(setNotification(error, 5))
@@ -127,11 +122,7 @@ const App = () => {
                         <button onClick={handleLogout}>Logout</button>
                     </p>
                     <Togglable buttonLabel="add new blog" ref={addBlogRef}>
-                        <Addblog
-                            blogService={blogService}
-                            blogs={blogs}
-                            setBlogs={setBlogs}
-                        />
+                        <Addblog />
                     </Togglable>
                     <h2>Blogs</h2>
                     {blogs.map((blog) => (
