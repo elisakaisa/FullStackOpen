@@ -1,0 +1,12 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNlY29uZHVzZXIiLCJpZCI6IjYyYzNkY2M2NmJhNGYxZTJjYThiNTY1NiIsImlhdCI6MTY1NzAwNDgxNn0.-Fk2adEAKFe6kBiISTr1Pssw3LI9hJByAB2kF_jHZr8
+
+{
+    "title": "token blog 3 middleware",
+    "author": "someoane else3",
+    "url": "www.tokenblogmiddlewere3.com",
+    "likes": 400,
+    //"userId": "62adea6f898767809aa5e81f"
+    "userId": "62c3dcc66ba4f1e2ca8b5656"
+}
