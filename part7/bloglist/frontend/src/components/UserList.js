@@ -1,16 +1,34 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import styled from 'styled-components'
+
+const Table = styled.table`
+    background: lightcyan;
+    margin: 0.25em;
+    padding: 1em;
+    th, td, tr {
+      padding: 1em;
+    }
+    table,
+    th,
+    td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    th {
+      text-align: left;
+    }
+`
 
 const UserList = () => {
 
-    const blogs = useSelector((state) => state.blogs)
     const users = useSelector(state => state.users)
 
     return (
         <div>
             <h2>Users</h2>
-            <table>
+            <Table>
                 <thead>
                     <tr>
                         <th>User</th>
@@ -25,7 +43,7 @@ const UserList = () => {
                         </tr>
                     ))}
                 </tbody>
-            </table>
+            </Table>
         </div>
     )
 }

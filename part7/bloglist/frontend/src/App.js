@@ -3,17 +3,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Route, Routes, useMatch } from 'react-router-dom'
 
 // Components
-import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Addblog from './components/Addblog'
 import Loginform from './components/Loginform'
 import Togglable from './components/Togglable'
-import { setNotification } from './reducers/notificationReducer'
-import { initializeBlogs, deleteBlog } from './reducers/blogReducer'
+import { initializeBlogs } from './reducers/blogReducer'
 import {
     loginAction,
     loginActionWindow,
-    logoutAction,
 } from './reducers/loginReducer'
 import { initializeUsers } from './reducers/usersReducer'
 import './index.css'
@@ -21,6 +18,19 @@ import UserList from './components/UserList'
 import UserView from './components/UserView'
 import BlogView from './components/BlogView'
 import BlogList from './components/BlogList'
+import Menu from './components/Menu'
+import styled from 'styled-components'
+
+// STYLING
+const Navigation = styled.div`
+background: powderblue;
+padding: 1em;
+`
+const Page = styled.div`
+  padding: 1em;
+  background: mintcream;
+`
+
 
 const App = () => {
     const dispatch = useDispatch()
@@ -69,46 +79,33 @@ const App = () => {
         setPassword('')
     }
 
-    // LOGOUT
-    const handleLogout = () => {
-        console.log('logout pressed')
-        dispatch(logoutAction())
-        dispatch(setNotification('Successfully logged out!', 5))
-    }
-
-    // delete blog
-    const deleteBlog2 = async (blog) => {
-        if (window.confirm(`Do you want to remove the blog "${blog.title}"?`)) {
-            dispatch(deleteBlog(blog.id))
-        }
-    }
+    
 
     return (
-        <div>
-            <h1>Blog App</h1>
-            <Notification />
-
+        <Page className="container">
             {user.name === null ? (
-                <Togglable buttonLabel="login">
-                    <Loginform
-                        handleLogin={handleLogin}
-                        username={username}
-                        password={password}
-                        handleUsernameChange={({ target }) =>
-                            setUsername(target.value)
-                        }
-                        handlePasswordChange={({ target }) =>
-                            setPassword(target.value)
-                        }
-                    />
-                </Togglable>
+                <div>
+                    <h1>Blog App</h1>
+                    <Notification />
+                    <Togglable buttonLabel="login">
+                        <Loginform
+                            handleLogin={handleLogin}
+                            username={username}
+                            password={password}
+                            handleUsernameChange={({ target }) =>
+                                setUsername(target.value)
+                            }
+                            handlePasswordChange={({ target }) =>
+                                setPassword(target.value)
+                            }
+                        />
+                    </Togglable>
+                </div>
             ) : (
                 <div>
-                    <p>
-                        {user.name} is logged in
-                        <button onClick={handleLogout}>Logout</button>
-                    </p>
-
+                    <Navigation><Menu /></Navigation>
+                    <h1>Blog App</h1>
+                    <Notification />
                     <Routes>
                         <Route path="/users" element={<UserList />}></Route>
                         <Route
@@ -131,12 +128,12 @@ const App = () => {
                         ></Route>
                         <Route
                             path="/blog/:id"
-                            element={<BlogView blog={viewBlog}/>}
+                            element={<BlogView blog={viewBlog} />}
                         ></Route>
                     </Routes>
                 </div>
             )}
-        </div>
+        </Page>
     )
 }
 

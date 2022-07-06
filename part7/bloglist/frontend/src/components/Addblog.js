@@ -1,7 +1,20 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { createBlog } from '../reducers/blogReducer'
-import { setNotification } from '../reducers/notificationReducer'
+import styled from 'styled-components'
+
+const Button = styled.button`
+  background: lightcyan;
+  font-size: 1em;
+  margin: 1em;
+  padding: 0.25em 1em;
+  border: 2px solid midnightblue;
+  border-radius: 3px;
+`
+
+const Input = styled.input`
+  margin: 0.25em;
+`
 
 const Addblog = () => {
     const dispatch = useDispatch()
@@ -23,37 +36,13 @@ const Addblog = () => {
         setNewTitle('')
         setNewAuthor('')
         setNewUrl('')
-
-        /*
-        try {
-            const newBlog = await blogService.create({
-                title: newTitle,
-                author: newAuthor,
-                url: newUrl,
-                likes: 0,
-            })
-            if ({}.hasOwnProperty.call(newBlog, 'error')) { 
-              dispatch(setNotification(newBlog.error, 5))
-             
-            } else {
-                setBlogs([...blogs, newBlog])
-
-                dispatch(setNotification(`Added blog "${newBlog.title}" by author "${newBlog.author}"`, 5))
-            }
-
-            setNewTitle('')
-            setNewAuthor('')
-            setNewUrl('')
-        } catch (error) {
-            dispatch(setNotification(error, 5))
-        } */
     }
 
     return (
         <form onSubmit={addBlog}>
             <div className="form">
                 title:
-                <input
+                <Input
                     id="title"
                     value={newTitle}
                     name="title"
@@ -62,7 +51,7 @@ const Addblog = () => {
             </div>
             <div>
                 author:
-                <input
+                <Input
                     id="author"
                     value={newAuthor}
                     name="author"
@@ -71,16 +60,16 @@ const Addblog = () => {
             </div>
             <div>
                 url:
-                <input
+                <Input
                     id="url"
                     value={newUrl}
                     name="url"
                     onChange={({ target }) => setNewUrl(target.value)}
                 />
             </div>
-            <button id="addBlog" type="submit">
+            <Button id="addBlog" type="submit">
                 create
-            </button>
+            </Button>
         </form>
     )
 }

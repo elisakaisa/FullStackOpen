@@ -3,11 +3,21 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
 import { deleteBlog, voteBlog } from '../reducers/blogReducer'
+import styled from 'styled-components'
+
+const Button = styled.button`
+  background: lightcyan;
+  font-size: 1em;
+  margin: 1em;
+  padding: 0.25em 1em;
+  border: 2px solid midnightblue;
+  border-radius: 3px;
+`
 
 const BlogView = ({ blog }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const user = useSelector(state => state.user)
+
 
     // delete blog
     const deleteBlog2 = async (blog) => {
@@ -36,10 +46,10 @@ const BlogView = ({ blog }) => {
             <p>{blog.info}</p>
             <p>
                 {blog.likes} likes
-                <button onClick={onLike}>Like</button>
+                <Button onClick={onLike}>Like</Button>
             </p>
             <p>added by {blog.user.name}</p>
-            <button onClick={() => deleteBlog2(blog)}>Delete</button>
+            <Button onClick={() => deleteBlog2(blog)}>Delete</Button>
         </div>
     )
 }
