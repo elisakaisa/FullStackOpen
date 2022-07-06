@@ -12,7 +12,8 @@ import Addblog from './components/Addblog'
 import Loginform from './components/Loginform'
 import Togglable from './components/Togglable'
 import { setNotification } from './reducers/notificationReducer'
-import { initializeBlogs } from './reducers/blogReducer'
+import { initializeBlogs, deleteBlog } from './reducers/blogReducer'
+import { loginAction, loginActionWindow, logoutAction } from './reducers/userReducer'
 import './index.css'
 
 const App = () => {
@@ -22,7 +23,7 @@ const App = () => {
     // STATES
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [user, setUser] = useState(null)
+    const user = useSelector(state => state.user)
 
     // Ref
     const addBlogRef = useRef()
@@ -35,73 +36,47 @@ const App = () => {
     // fetch user from local storage
     useEffect(() => {
         const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
+        console.log('loggedin user', loggedUserJSON)
+        
         if (loggedUserJSON) {
             const user = JSON.parse(loggedUserJSON)
-            setUser(user)
-            blogService.setToken(user.token)
+            //setUser(user)
+            //blogService.setToken(user.token)
+            console.log('user', user)
+            dispatch(loginActionWindow(user))
+            console.log('user', user)
+            
         }
-    }, [])
+    }, [dispatch])
 
     // LOGIN
     const handleLogin = async (event) => {
         event.preventDefault()
-
-        try {
-            const user = await loginService.login({
-                username,
-                password,
-            })
-
-            // save user  token to local storage
-            window.localStorage.setItem(
-                'loggedBlogAppUser',
-                JSON.stringify(user)
-            )
-            blogService.setToken(user.token)
-
-            setUser(user)
-            setUsername('')
-            setPassword('')
-
-            dispatch(setNotification(`Successfully logged in as ${user.name}!`, 5))
-        } catch (exception) {
-            dispatch(setNotification('Wrong credentials', 5))
-        }
+        dispatch(loginAction({ username, password }))
+        setUsername('')
+        setPassword('')
     }
 
     // LOGOUT
     const handleLogout = () => {
-        window.localStorage.removeItem('loggedBlogAppUser')
-        setUser(null)
+        console.log('logout pressed')
+        dispatch(logoutAction())
         dispatch(setNotification('Successfully logged out!', 5))
     }
 
     // delete blog
-    const deleteBlog = async (blog) => {
-        if (
-            !window.confirm(`Do you want to remove the blog "${blog.title}"?`)
-        ) {
-            return
-        }
-        try {
-            const response = await blogService.removeBlog(blog.id)
-            if ({}.hasOwnProperty.call(response, 'error')) {
-              dispatch(setNotification(response.error, 5))
-            } else {
-                //setBlogs(blogs.filter((b) => b.id !== blog.id))
-                dispatch(initializeBlogs())
-            }
-        } catch (error) {
-          dispatch(setNotification(error, 5))
-        }
-    }
+    const deleteBlog2 = async (blog) => {
+      if (window.confirm(`Do you want to remove the blog "${blog.title}"?`)) {
+        dispatch(deleteBlog(blog.id))
+      } 
+  }
 
     return (
         <div>
             <h1>Blog App</h1>
             <Notification />
 
-            {user === null ? (
+            {user.name === null ? (
                 <Togglable buttonLabel="login">
                     <Loginform
                         handleLogin={handleLogin}
@@ -129,9 +104,8 @@ const App = () => {
                         <Blog
                             key={blog.id}
                             blog={blog}
-                            deleteBlog={deleteBlog}
+                            deleteBlog={deleteBlog2}
                             user={user}
-                            blogService={blogService}
                         />
                     ))}
                 </div>

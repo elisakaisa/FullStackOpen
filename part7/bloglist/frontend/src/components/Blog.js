@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import { voteBlog } from '../reducers/blogReducer'
+import { useDispatch } from 'react-redux'
 
-const Blog = ({ blog, deleteBlog, user, blogService }) => {
+const Blog = ({ blog, user, deleteBlog }) => {
     // styling
     const blogStyle = {
         paddingTop: 10,
@@ -10,31 +12,16 @@ const Blog = ({ blog, deleteBlog, user, blogService }) => {
         marginBottom: 5,
     }
 
+    const dispatch = useDispatch()
+
     // useState
     const [visibility, setVisibility] = useState(false)
-    const [likes, setLikes] = useState(blog.likes)
 
     // Like blog
     const onLike = async (event) => {
         event.preventDefault()
-        try {
-            const response = await blogService.updateLike(blog)
-            console.log('onLike', blog)
-            if ({}.hasOwnProperty.call(response, 'error')) {
-                console.log('error in onlike')
-                /*setErrorMessage(response.error)
-                setTimeout(() => {
-                    setErrorMessage(null)
-                }, 5000) */
-            } else {
-                setLikes(likes + 1)
-            }
-        } catch (error) {
-            /*setErrorMessage(error)
-            setTimeout(() => {
-                setErrorMessage(null)
-            }, 5000) */
-        }
+        console.log('onLike: blog: ', blog)
+        dispatch(voteBlog(blog))
     }
 
     return (
