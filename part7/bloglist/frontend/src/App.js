@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
-// Services
-import blogService from './services/blogs'
-import loginService from './services/login'
+import { Route, Routes, useMatch } from 'react-router-dom'
 
 // Components
 import Blog from './components/Blog'
@@ -13,41 +10,46 @@ import Loginform from './components/Loginform'
 import Togglable from './components/Togglable'
 import { setNotification } from './reducers/notificationReducer'
 import { initializeBlogs, deleteBlog } from './reducers/blogReducer'
-import { loginAction, loginActionWindow, logoutAction } from './reducers/userReducer'
+import {
+    loginAction,
+    loginActionWindow,
+    logoutAction,
+} from './reducers/loginReducer'
+import { initializeUsers } from './reducers/usersReducer'
 import './index.css'
+import UserList from './components/UserList'
+import UserView from './components/UserView'
 
 const App = () => {
-
-  const dispatch = useDispatch()
+    const dispatch = useDispatch()
 
     // STATES
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const user = useSelector(state => state.user)
+    const user = useSelector((state) => state.user)
 
     // Ref
     const addBlogRef = useRef()
 
     useEffect(() => {
-      dispatch(initializeBlogs())
+        dispatch(initializeBlogs())
+        dispatch(initializeUsers())
     }, [dispatch])
-    const blogs = useSelector(state => state.blogs)
+    const blogs = useSelector((state) => state.blogs)
+    const users = useSelector((state) => state.users)
 
     // fetch user from local storage
     useEffect(() => {
         const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
-        console.log('loggedin user', loggedUserJSON)
-        
         if (loggedUserJSON) {
             const user = JSON.parse(loggedUserJSON)
-            //setUser(user)
-            //blogService.setToken(user.token)
-            console.log('user', user)
             dispatch(loginActionWindow(user))
-            console.log('user', user)
-            
         }
     }, [dispatch])
+
+    // individual user page
+    const userMatch = useMatch('/user/:id')
+    const viewUser = userMatch ? users.find(u => u.id === userMatch.params.id) : null
 
     // LOGIN
     const handleLogin = async (event) => {
@@ -66,10 +68,10 @@ const App = () => {
 
     // delete blog
     const deleteBlog2 = async (blog) => {
-      if (window.confirm(`Do you want to remove the blog "${blog.title}"?`)) {
-        dispatch(deleteBlog(blog.id))
-      } 
-  }
+        if (window.confirm(`Do you want to remove the blog "${blog.title}"?`)) {
+            dispatch(deleteBlog(blog.id))
+        }
+    }
 
     return (
         <div>
@@ -96,18 +98,35 @@ const App = () => {
                         {user.name} is logged in
                         <button onClick={handleLogout}>Logout</button>
                     </p>
-                    <Togglable buttonLabel="add new blog" ref={addBlogRef}>
-                        <Addblog />
-                    </Togglable>
-                    <h2>Blogs</h2>
-                    {blogs.map((blog) => (
-                        <Blog
-                            key={blog.id}
-                            blog={blog}
-                            deleteBlog={deleteBlog2}
-                            user={user}
-                        />
-                    ))}
+
+                    <Routes>
+                        <Route path="/users" element={<UserList />}></Route>
+                        <Route
+                            path="/"
+                            element={
+                                <div>
+                                    <Togglable
+                                        buttonLabel="add new blog"
+                                        ref={addBlogRef}
+                                    >
+                                        <Addblog />
+                                    </Togglable>
+                                    <h2>Blogs</h2>
+                                    {blogs.map((blog) => (
+                                        <Blog
+                                            key={blog.id}
+                                            blog={blog}
+                                            deleteBlog={deleteBlog2}
+                                            user={user}
+                                        />
+                                    ))}
+                                </div>
+                            }
+                        ></Route>
+                        <Route path="/user/:id" element={<UserView user={viewUser} />}>
+                            
+                        </Route>
+                    </Routes>
                 </div>
             )}
         </div>

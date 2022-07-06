@@ -12,11 +12,10 @@ const initialState = {
   }
 
 const userSlice = createSlice({
-    name: 'users',
+    name: 'user',
     initialState: initialState,
     reducers: {
         loginUser(state, action) {
-            console.log(action)
             return action.payload
         },
         logoutUser(state, action) {
@@ -52,7 +51,6 @@ export const loginAction = ({ username, password}) => {
 }
 
 // login from saved state
-// login from user action
 export const loginActionWindow = (user) => {
     return async dispatch => {
 
@@ -70,7 +68,6 @@ export const loginActionWindow = (user) => {
 export const logoutAction = () => {
     return async dispatch => {
         window.localStorage.removeItem('loggedBlogAppUser')
-        //console.log(window.localStorage.getItem('loggedBlogAppUser'))
         blogService.setToken(null)
         dispatch(logoutUser())
     }
