@@ -19,6 +19,8 @@ import { initializeUsers } from './reducers/usersReducer'
 import './index.css'
 import UserList from './components/UserList'
 import UserView from './components/UserView'
+import BlogView from './components/BlogView'
+import BlogList from './components/BlogList'
 
 const App = () => {
     const dispatch = useDispatch()
@@ -49,7 +51,15 @@ const App = () => {
 
     // individual user page
     const userMatch = useMatch('/user/:id')
-    const viewUser = userMatch ? users.find(u => u.id === userMatch.params.id) : null
+    const viewUser = userMatch
+        ? users.find((u) => u.id === userMatch.params.id)
+        : null
+
+    // individual blog page
+    const blogMatch = useMatch('/blog/:id')
+    const viewBlog = blogMatch
+        ? blogs.find((b) => b.id === blogMatch.params.id)
+        : null
 
     // LOGIN
     const handleLogin = async (event) => {
@@ -111,21 +121,18 @@ const App = () => {
                                     >
                                         <Addblog />
                                     </Togglable>
-                                    <h2>Blogs</h2>
-                                    {blogs.map((blog) => (
-                                        <Blog
-                                            key={blog.id}
-                                            blog={blog}
-                                            deleteBlog={deleteBlog2}
-                                            user={user}
-                                        />
-                                    ))}
+                                    <BlogList />
                                 </div>
                             }
                         ></Route>
-                        <Route path="/user/:id" element={<UserView user={viewUser} />}>
-                            
-                        </Route>
+                        <Route
+                            path="/user/:id"
+                            element={<UserView user={viewUser} />}
+                        ></Route>
+                        <Route
+                            path="/blog/:id"
+                            element={<BlogView blog={viewBlog}/>}
+                        ></Route>
                     </Routes>
                 </div>
             )}
