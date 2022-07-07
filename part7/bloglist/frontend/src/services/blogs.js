@@ -39,9 +39,26 @@ const updateLike = async (blog) => {
         title: blog.title,
         url: blog.url,
         user: blog.user ? blog.user._id : null,
-        likes: blog.likes + 1
+        likes: blog.likes + 1,
+        comments: blog.comments
       }
         const response = await axios.put(`${baseUrl}/${blog.id}`, likedBlog)
+        return response.data
+    } catch (error) {
+        if (error.response.data.error) {
+            return error.response.data
+        } else if (error.response.data) {
+            return { error: error.response.data } // proxy errors
+        } else {
+            return { error: 'Unknown error' }
+        }
+    }
+}
+
+const commentBlog = async (blog, comment) => {
+    try {
+        console.log(`${baseUrl}/${blog.id}`)
+        const response = await axios.post(`${baseUrl}/${blog.id}/comments`, {comment})
         return response.data
     } catch (error) {
         if (error.response.data.error) {
@@ -73,4 +90,4 @@ const removeBlog = async (id) => {
     }
 }
 
-export default { getAll, setToken, create, updateLike, removeBlog }
+export default { getAll, setToken, create, updateLike, removeBlog, commentBlog }

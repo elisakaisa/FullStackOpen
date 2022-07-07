@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+// get all blogs
 router.get('/', async (request, response) => {
   const notes = await Blog
     .find({})
@@ -12,13 +13,14 @@ router.get('/', async (request, response) => {
   response.json(notes)
 })
 
+// add blog
 router.post('/', async (request, response) => {
   if (!request.user) {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
 
   const user = request.user
-  const blog = new Blog({ ...request.body, user: user.id })
+  const blog = new Blog({ ...request.body, user: user.id, comments: [] })
 
   const savedBlog = await blog.save()
 
@@ -32,6 +34,7 @@ router.post('/', async (request, response) => {
   response.status(201).json(blogToReturn)
 })
 
+// delete blog
 router.delete('/:id', async (request, response) => {
   const blogToDelete = await Blog.findById(request.params.id)
   if (!blogToDelete ) {
@@ -49,6 +52,7 @@ router.delete('/:id', async (request, response) => {
   response.status(204).end()
 })
 
+// update likes
 router.put('/:id', async (request, response) => {
   const blog = request.body
 
@@ -60,6 +64,24 @@ router.put('/:id', async (request, response) => {
     ).populate('user', { username: 1, name: 1 })
       
   response.json(updatedBlog)
+})
+
+// add comment to blog
+router.post('/:id/comments', async (request, response) => {
+  if (!request.body.comment) {
+    return response.status(400).json({ error: 'comment missing'})
+  }
+
+  // Look up blog
+  const blog = await Blog.findById(request.params.id)
+  if (!blog) {
+    return response.status(400).json({ error: 'blog ID invalid' })
+  }
+
+  blog.comments = blog.comments.concat(request.body.comment)
+  await blog.save()
+
+  return response.status(201).json(blog)
 })
 
 module.exports = router
