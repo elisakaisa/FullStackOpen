@@ -21,7 +21,6 @@ const BirthyearForm = ( {authors} ) => {
             }
           })
 
-        //setName('')
         setBorn('')
     }
 
