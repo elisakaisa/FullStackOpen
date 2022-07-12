@@ -5,7 +5,9 @@ query {
   allBooks {
     title
     published
-    author
+    author {
+      name 
+    }
     id
   }
 }
@@ -47,6 +49,14 @@ export const EDIT_BIRTH_YEAR = gql`
       name
       born
       bookCount
+    }
+  }
+`
+
+export const LOGIN = gql`
+  mutation login($username: String!, $password: String!) {
+    login(username: $username, password: $password)  {
+      value
     }
   }
 `
