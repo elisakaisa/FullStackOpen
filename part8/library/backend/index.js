@@ -55,6 +55,7 @@ const typeDefs = gql`
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
     me: User
+    uniqueGenres: [String!]
   }
 
   type Mutation {
@@ -70,7 +71,7 @@ const typeDefs = gql`
     ): Author
     createUser(
       username: String!
-      favoriteGenre: String!
+      favouriteGenre: String!
     ): User
     login(
       username: String!
@@ -100,6 +101,14 @@ const resolvers = {
     },
     me: (root, args, context) => {
       return context.currentUser
+    },
+    uniqueGenres: async () => {
+      const books = await Book.find({})
+      let uniqueGenres = []
+      books.forEach(book => {
+        uniqueGenres = uniqueGenres.concat(book.genres)
+      })
+      return [...new Set(uniqueGenres)]
     }
   },
   Mutation: {
@@ -158,14 +167,17 @@ const resolvers = {
     
     // LOGIN STUFF
     createUser: async (root, args) => {
-      const user = new User({ username: args.username })
+      const user = new User({ ...args })
   
-      return user.save()
-        .catch(error => {
-          throw new UserInputError(error.message, {
-            invalidArgs: args,
-          })
+      try {
+        await user.save()
+      }
+      catch(error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
         })
+      }
+      return user
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username })
