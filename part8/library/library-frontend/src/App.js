@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useApolloClient } from '@apollo/client'
 import Authors from './components/Authors'
 import Books from './components/Books'
@@ -19,6 +19,13 @@ const App = () => {
   const [token, setToken] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
   const client = useApolloClient()
+
+  useEffect(() => {
+    const tokenString = window.localStorage.getItem('library-user-token')
+    if (tokenString) {
+      setToken(tokenString)
+    }
+  }, [])
 
   const logout = () => {
     setToken(null)
