@@ -5,10 +5,13 @@ import { uid } from "react-uid";
 
 import { Patient, Discharge, SickLeave, Entry, HealthCheckRating } from '../types';
 import { apiBaseUrl } from '../constants';
-import { useStateValue, getPatientDetails } from '../state';
+import { useStateValue, getPatientDetails, addEntry } from '../state';
 import { Container } from '@material-ui/core';
 import { Transgender, Female, Male } from "@mui/icons-material";
 import { LocalHospital, Sick, MonitorHeart, Favorite } from '@mui/icons-material/';
+import { Button, Typography } from "@material-ui/core";
+import { EntryFormValues } from "../AddEntryForm/AddEntryForm";
+import AddEntryModal from "../AddEntryForm";
 
 const Hospital = ({ discharge }: { discharge: Discharge }) => {
     return (
@@ -69,6 +72,7 @@ const Hospital = ({ discharge }: { discharge: Discharge }) => {
 const PatientData = () => {
 
     const [{ patients, diagnoses }, dispatch] = useStateValue();
+    const [modalOpen, setModalOpen] = React.useState<boolean>(false);
     
     const { id } = useParams<{ id: string }>();
     const patient = patients[id as string];
@@ -150,6 +154,30 @@ const PatientData = () => {
         }
       };
 
+      // Add Entry
+        const openModal = (): void => setModalOpen(true);
+
+        const closeModal = (): void => {
+            setModalOpen(false);
+        };
+
+        const submitNewEntry = async (values: EntryFormValues) => {
+            try {
+            const { data: newEntry } = await axios.post<Entry>(
+                `${apiBaseUrl}/patients/${id as string}/entries`,
+                values
+                );
+            dispatch(addEntry(newEntry, id as string));
+            closeModal();
+            } catch (e: unknown) {
+            if (axios.isAxiosError(e)) {
+                console.error(e?.response?.data || "Unrecognized axios error");
+            } else {
+                console.error("Unknown error", e);
+            }
+            }
+        };
+
       const styles = {
         border: '1px solid red'
    };
@@ -175,7 +203,15 @@ const PatientData = () => {
                 Diagnose by <i>{entry.specialist}</i>
                 </div>
                 ))}
-
+            <Typography style={{ marginBottom: "1em" }} align="left" variant="h5">Entries</Typography>
+            <Button variant="contained" onClick={() => openModal()}>
+                Add new Hospital entry
+            </Button>
+            <AddEntryModal 
+                modalOpen={modalOpen}
+                onSubmit={submitNewEntry}
+                onClose={closeModal}
+            />
 
         </Container>
     );

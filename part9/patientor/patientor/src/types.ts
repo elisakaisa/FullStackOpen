@@ -66,3 +66,8 @@ export type Entry =
   | HospitalEntry
   | OccupationalHealthcareEntry
   | HealthCheckEntry;
+
+export type AddEntry = {
+  entry: Entry;
+  patientId: string;
+};
