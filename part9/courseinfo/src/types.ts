@@ -1,20 +1,35 @@
-export interface Diagnosis {
-  code: string;
+interface CoursePartBase {
   name: string;
-  latin?: string;
+  exerciseCount: number;
+  type: string;
 }
 
-export enum Gender {
-  Male = "male",
-  Female = "female",
-  Other = "other"
+interface CoursePartOne extends CoursePartBase {
+  name: "Fundamentals";
+  description: string;
 }
 
-export interface Patient {
-  id: string;
-  name: string;
-  occupation: string;
-  gender: Gender;
-  ssn?: string;
-  dateOfBirth?: string;
+interface CoursePartOneB extends CoursePartBase {
+  name: "Advanced";
+  description: string;
 }
+
+interface CoursePartTwo extends CoursePartBase {
+  name: "Using props to pass data";
+  groupProjectCount: number;
+}
+
+interface CoursePartThree extends CoursePartBase {
+  name: "Deeper type usage";
+  description: string;
+  exerciseSubmissionLink: string;
+}
+
+interface CoursePartFour extends CoursePartBase {
+  name: "Backend development";
+  description: string;
+  requirements: string[];
+}
+
+export type CoursePart = CoursePartOne | CoursePartOneB |
+                          CoursePartTwo | CoursePartThree | CoursePartFour ;
