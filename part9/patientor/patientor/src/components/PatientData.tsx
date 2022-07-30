@@ -1,6 +1,7 @@
 import React, {  useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { uid } from "react-uid";
 
 import { Patient } from '../types';
 import { apiBaseUrl } from '../constants';
@@ -10,11 +11,13 @@ import { Transgender, Female, Male } from "@mui/icons-material";
 
 const PatientData = () => {
 
-    const [{ patients }, dispatch] = useStateValue();
+    const [{ patients, diagnoses }, dispatch] = useStateValue();
     
     const { id } = useParams<{ id: string }>();
 
     const patient = patients[id as string];
+    console.log(diagnoses);
+    const entries = patient.entries;
 
     useEffect(() => {
         const fetchPatient = async () => {
@@ -52,12 +55,23 @@ const PatientData = () => {
     return (
         <Container>
             <h1>{patient.name} {genderIcon(patient)}</h1>
-            <p>
-                <strong>SSN:</strong> {patient.ssn}
-            </p>
-            <p>
-                <strong>Occupation:</strong> {patient.occupation}
-            </p>
+            <p>SSN: {patient.ssn}</p>
+            <p>Occupation: {patient.occupation}</p>
+            <h3>Entries</h3>
+            {entries.map(entry => (
+                <div key={entry.id}>
+                    <p>{entry.date}: {entry.description}</p>
+                    <ul>
+                    {entry.diagnosisCodes?.map((code) => (
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+                    <li key={uid({})}>
+                        {code} - {diagnoses[code] && diagnoses[code].name}
+                    </li>
+                    ))}
+                </ul>
+                </div>
+                ))}
+
 
         </Container>
     );
